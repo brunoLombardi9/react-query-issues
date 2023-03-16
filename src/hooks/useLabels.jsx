@@ -8,7 +8,7 @@ const useLabels = () => {
   });   
 
   async function getLabels() {
-    const { data } = await githubApi.get("/labels");
+    const { data } = await githubApi.get("/labels?per_page=100");
     return data;
   }
 

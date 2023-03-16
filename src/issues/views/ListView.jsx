@@ -5,7 +5,8 @@ import { LabelPicker } from "../components/LabelPicker";
 
 export const ListView = () => {
   const [selectedLabels, setSelectedLabels] = useState([]);
-  const { issuesQuery } = useIssues();
+  const [state, setState] = useState();
+  const { issuesQuery } = useIssues({state, labels: selectedLabels});
 
   function onLabelChange(labelName) {
     selectedLabels.includes(labelName)
@@ -13,10 +14,22 @@ export const ListView = () => {
       : setSelectedLabels([...selectedLabels, labelName]);
   }
 
+  function onStateChange(option) {
+    setState(option);
+  }
+
   return (
-    <div className="row mt-5">  
+    <div className="row mt-5">
       <div className="col-8">
-        {issuesQuery.isLoading ? <p>Loading...</p> : <IssueList issues={issuesQuery.data || []}/>}
+        {issuesQuery.isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <IssueList
+            issues={issuesQuery.data || []}
+            state={state}
+            onStateChange={onStateChange}
+          />
+        )}
       </div>
 
       <div className="col-4">

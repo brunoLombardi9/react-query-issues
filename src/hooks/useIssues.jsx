@@ -2,14 +2,30 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import githubApi from "../api/githubApi";
 
-const useIssues = () => {
-  const issuesQuery = useQuery(["issues"], getIssues , {refetchOnWindowFocus: false});
+async function getIssues(labels, state) {
+  const params = new URLSearchParams();
 
-  async function getIssues() {
-    const { data } = await githubApi.get("/issues");
+  if (state) params.append("state", state);
 
-    return data;
+  if (labels.length > 0) {
+    const labelString = labels.join(",");
+    params.append("labels", labelString);
   }
+
+  params.append("page", "1");
+  params.append("per_page", "5");
+
+  const { data } = await githubApi.get("/issues", { params });
+
+  return data;
+}
+
+const useIssues = ({ state, labels }) => {
+  const issuesQuery = useQuery(
+    ["issues", { state, labels }],
+    () => getIssues(labels, state),
+    { refetchOnWindowFocus: false }
+  );
 
   return { issuesQuery };
 };

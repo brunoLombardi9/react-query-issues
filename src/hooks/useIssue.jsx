@@ -2,20 +2,34 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import githubApi from "../api/githubApi";
 
-const useIssue = ( issueNumber ) => {
-  const issueQuery = useQuery(["issue", issueNumber], getIssue, {
-    refetchOnWindowFocus: false,
-  });
+const useIssue = (issueNumber) => {
+  const issueQuery = useQuery(
+    ["issue", issueNumber],
+    () => getIssue(issueNumber),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
-  console.log(issueNumber);
+  const commentsQuery = useQuery(
+    ["comments", issueNumber],
+    () => getIssueComments(issueNumber),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
-  async function getIssue() {
-    const { data } = await githubApi.get(`/issues/${issueNumber}`);
-console.log(data)
-    return data;
-  }
-
-  return issueQuery;
+  return { issueQuery, commentsQuery };
 };
+
+export async function getIssue(number) {
+  const { data } = await githubApi.get(`/issues/${number}`);
+  return data;
+}
+
+export async function getIssueComments(number) {
+  const { data } = await githubApi.get(`/issues/${number}/comments`);
+  return data;
+}
 
 export default useIssue;
